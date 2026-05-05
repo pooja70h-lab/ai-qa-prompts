@@ -3,7 +3,7 @@
 Product landing page for the AI-Powered QA Toolkit by Pooja Hiremath.
 
 ## 🔗 Live Site
-[qa-toolkit.vercel.app](https://qa-toolkit.vercel.app)
+[qa-toolkit.vercel.app](https://ai-qa-prompts.vercel.app/)
 
 ## 🛠️ Built With
 - Vanilla HTML, CSS, JavaScript
