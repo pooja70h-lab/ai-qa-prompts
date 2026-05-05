@@ -277,13 +277,16 @@
   /* Module Cards */
   .modules-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1px;
     background: var(--border);
     border: 1px solid var(--border);
     border-radius: 16px;
     overflow: hidden;
   }
+
+  .module-card:nth-child(4) { grid-column: span 1; }
+  .module-card:nth-child(5) { grid-column: span 2; }
 
   .module-card {
     background: var(--surface);
@@ -344,6 +347,9 @@
     position: relative;
     z-index: 1;
   }
+
+  .module-unlock { font-size: 0.75rem; color: var(--accent); font-family: 'Space Mono', monospace; margin-top: 1rem; opacity: 0; transition: opacity 0.3s; position: relative; z-index: 1; }
+  .module-card:hover .module-unlock { opacity: 1; }
 
   .module-desc {
     font-size: 0.88rem;
@@ -730,35 +736,39 @@
   </div>
 
   <div class="modules-grid reveal">
-    <div class="module-card" style="--card-color:#a78bfa;--card-glow:rgba(167,139,250,0.08)">
+    <div class="module-card" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})" title="Get access to all prompts →" style="--card-color:#a78bfa;--card-glow:rgba(167,139,250,0.08)">
       <span class="module-emoji">⚡</span>
       <div class="module-name">Daily Sprint</div>
       <div class="module-count">17 prompts</div>
       <div class="module-desc">BDD scenarios, test case writing, requirement analysis, and Jira ticket breakdowns. Your everyday QA accelerator.</div>
+      <div class="module-unlock">🔒 Get access →</div>
     </div>
-    <div class="module-card" style="--card-color:#fb923c;--card-glow:rgba(251,146,60,0.08)">
+    <div class="module-card" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})" title="Get access to all prompts →" style="--card-color:#fb923c;--card-glow:rgba(251,146,60,0.08)">
       <span class="module-emoji">🏗️</span>
       <div class="module-name">Code Architect</div>
       <div class="module-count">48 prompts</div>
       <div class="module-desc">Playwright & Selenium scripts, POM generation, API mocking, data-driven tests, and CI/CD pipeline snippets.</div>
     </div>
-    <div class="module-card" style="--card-color:#facc15;--card-glow:rgba(250,204,21,0.08)">
+    <div class="module-card" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})" title="Get access to all prompts →" style="--card-color:#facc15;--card-glow:rgba(250,204,21,0.08)">
       <span class="module-emoji">🐛</span>
       <div class="module-name">Bug Hunter</div>
       <div class="module-count">27 prompts</div>
       <div class="module-desc">Flaky test diagnosis, log analysis, race condition detection, memory leak hunting. Kill bugs faster.</div>
+      <div class="module-unlock">🔒 Get access →</div>
     </div>
-    <div class="module-card" style="--card-color:#6dfacc;--card-glow:rgba(109,250,204,0.08)">
+    <div class="module-card" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})" title="Get access to all prompts →" style="--card-color:#6dfacc;--card-glow:rgba(109,250,204,0.08)">
       <span class="module-emoji">🧠</span>
       <div class="module-name">Strategy Room</div>
       <div class="module-count">28 prompts</div>
       <div class="module-desc">Risk matrices, test plans, metrics dashboards, release readiness, ROI calculators. Lead like a senior.</div>
+      <div class="module-unlock">🔒 Get access →</div>
     </div>
-    <div class="module-card" style="--card-color:#fa6d9f;--card-glow:rgba(250,109,159,0.08)">
+    <div class="module-card" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})" title="Get access to all prompts →" style="--card-color:#fa6d9f;--card-glow:rgba(250,109,159,0.08)">
       <span class="module-emoji">🚀</span>
       <div class="module-name">Anchor Mega-Prompt</div>
       <div class="module-count">1 power prompt</div>
       <div class="module-desc">One Jira ticket in → complete QA package out. Gherkin, Playwright, Selenium, test data, CI/CD. All at once.</div>
+      <div class="module-unlock">🔒 Get access →</div>
     </div>
   </div>
 </section>
@@ -874,7 +884,6 @@
       <div class="creator-links">
         <a class="creator-link" href="https://testmind-ai.vercel.app" target="_blank">TestMind AI</a>
         <a class="creator-link" href="https://linkedin.com/in/hiremath-p" target="_blank">LinkedIn</a>
-        <a class="creator-link" href="https://pooja70h-lab.github.io/ml-portfolio" target="_blank">Portfolio</a>
       </div>
     </div>
   </div>
