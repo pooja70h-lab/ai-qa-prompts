@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Powered QA Toolkit — by Pooja Hiremath</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050508;
+    --surface: #0d0d14;
+    --surface2: #12121c;
+    --border: rgba(255,255,255,0.06);
+    --text: #f0f0f8;
+    --muted: #6b6b8a;
+    --accent: #7c6dfa;
+    --accent2: #fa6d9f;
+    --accent3: #6dfacc;
+    --accent4: #facc6d;
+    --glow: rgba(124,109,250,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(124,109,250,0.4);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.15s ease;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.4;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,109,250,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,109,250,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ---- HERO ---- */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    z-index: 2;
+    overflow: hidden;
+  }
+
+  .hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    animation: orbFloat 8s ease-in-out infinite;
+  }
+  .orb1 { width: 500px; height: 500px; background: rgba(124,109,250,0.12); top: -100px; left: -100px; animation-delay: 0s; }
+  .orb2 { width: 400px; height: 400px; background: rgba(250,109,159,0.08); bottom: -80px; right: -80px; animation-delay: -3s; }
+  .orb3 { width: 300px; height: 300px; background: rgba(109,250,204,0.06); top: 50%; left: 60%; animation-delay: -5s; }
+
+  @keyframes orbFloat {
+    0%, 100% { transform: translate(0,0) scale(1); }
+    33% { transform: translate(30px,-20px) scale(1.05); }
+    66% { transform: translate(-20px,15px) scale(0.95); }
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(124,109,250,0.1);
+    border: 1px solid rgba(124,109,250,0.3);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.8s ease both;
+  }
+  .badge-dot {
+    width: 6px; height: 6px;
+    background: var(--accent3);
+    border-radius: 50%;
+    animation: pulse 2s ease infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform: scale(1); }
+    50% { opacity:0.4; transform: scale(0.7); }
+  }
+
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.5rem, 7vw, 5.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+
+  .title-line { display: block; }
+  .title-gradient {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--accent3) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.8s 0.2s ease both;
+    font-weight: 300;
+  }
+  .hero-sub strong { color: var(--text); font-weight: 500; }
+
+  .hero-ctas {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: none;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.02em;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(124,109,250,0.4); }
+  .btn-primary:hover::before { opacity: 1; }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: none;
+    transition: all 0.2s ease;
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+
+  .stats-row {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    margin-top: 4rem;
+    animation: fadeUp 0.8s 0.4s ease both;
+    flex-wrap: wrap;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff, var(--muted));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---- SECTIONS ---- */
+  section {
+    position: relative;
+    z-index: 2;
+    padding: 5rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+  }
+
+  .section-sub {
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 500px;
+    margin-bottom: 3rem;
+    font-weight: 300;
+  }
+
+  /* Module Cards */
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .module-card {
+    background: var(--surface);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s ease;
+    cursor: none;
+  }
+  .module-card:hover { background: var(--surface2); }
+  .module-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--card-color, var(--accent));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .module-card:hover::before { transform: scaleX(1); }
+  .module-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, var(--card-glow, rgba(124,109,250,0.06)), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .module-card:hover::after { opacity: 1; }
+
+  .module-emoji {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    display: block;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease;
+  }
+  .module-card:hover .module-emoji { transform: scale(1.15) rotate(-5deg); }
+
+  .module-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .module-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--card-color, var(--accent));
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .module-desc {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.6;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Prompt Cards */
+  .prompts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+  }
+
+  .prompt-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: none;
+  }
+  .prompt-card:hover {
+    border-color: rgba(124,109,250,0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,109,250,0.1);
+  }
+
+  .prompt-card-glow {
+    position: absolute;
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    filter: blur(40px);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    top: -30px; right: -30px;
+  }
+  .prompt-card:hover .prompt-card-glow { opacity: 1; }
+
+  .prompt-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    background: rgba(124,109,250,0.1);
+    color: var(--accent);
+    border: 1px solid rgba(124,109,250,0.2);
+  }
+
+  .prompt-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .prompt-use {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .prompt-preview {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    line-height: 1.6;
+    overflow: hidden;
+    max-height: 60px;
+  }
+  .prompt-preview span { color: var(--accent3); }
+
+  /* Features */
+  .features-strip {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+
+  .feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .feature-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    background: rgba(124,109,250,0.1);
+    border: 1px solid rgba(124,109,250,0.15);
+  }
+
+  .feature-text h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .feature-text p {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* CTA */
+  .cta-section {
+    text-align: center;
+    padding: 5rem 2rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .cta-box {
+    max-width: 640px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid rgba(124,109,250,0.2);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-box::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3), var(--accent));
+    background-size: 300% 300%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: borderSpin 4s linear infinite;
+    opacity: 0.6;
+  }
+
+  @keyframes borderSpin {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .cta-price {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent3);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+  }
+
+  .cta-amount {
+    font-family: 'Syne', sans-serif;
+    font-size: 4rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .cta-amount sup {
+    font-size: 1.5rem;
+    font-weight: 400;
+    vertical-align: top;
+    margin-top: 0.5rem;
+  }
+
+  .cta-tagline {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+
+  .cta-includes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+    margin-bottom: 2rem;
+  }
+
+  .cta-include-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .check { color: var(--accent3); font-size: 0.9rem; }
+
+  /* Creator */
+  .creator-section {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+  }
+
+  .creator-avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .creator-avatar::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    z-index: -1;
+    filter: blur(6px);
+    opacity: 0.5;
+  }
+
+  .creator-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .creator-bio {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .creator-links {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+
+  .creator-link {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--accent);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border: 1px solid rgba(124,109,250,0.2);
+    padding: 3px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  .creator-link:hover { background: rgba(124,109,250,0.1); }
+
+  .divider {
+    border: none;
+    height: 1px;
+    background: var(--border);
+    margin: 0 2rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: rgba(124,109,250,0.3); border-radius: 3px; }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 600px) {
+    .stats-row { gap: 24px; }
+    .creator-section { flex-direction: column; text-align: center; }
+    .creator-links { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-orb orb1"></div>
+  <div class="hero-orb orb2"></div>
+  <div class="hero-orb orb3"></div>
+
+  <div class="badge">
+    <span class="badge-dot"></span>
+    Built by a Senior QA Lead &amp; TestMind AI Creator
+  </div>
+
+  <h1 class="hero-title">
+    <span class="title-line">Your AI cheat code</span>
+    <span class="title-line title-gradient">for QA engineering</span>
+  </h1>
+
+  <p class="hero-sub">
+    <strong>121 battle-tested prompts</strong> across 5 modules. Stop spending hours on test plans, bug reports, and automation scripts. Copy. Paste. Ship.
+  </p>
+
+  <div class="hero-ctas">
+    <button class="btn-primary" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">
+      Get the Toolkit — $27
+    </button>
+    <button class="btn-secondary" onclick="document.getElementById('modules').scrollIntoView({behavior:'smooth'})">
+      See What's Inside ↓
+    </button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-num">121</div>
+      <div class="stat-label">Prompts</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">5</div>
+      <div class="stat-label">Modules</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">9+</div>
+      <div class="stat-label">Yrs Experience</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Hours Saved</div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- MODULES -->
+<section id="modules">
+  <div class="reveal">
+    <div class="section-label">// What's inside</div>
+    <h2 class="section-title">5 modules.<br>Every QA scenario covered.</h2>
+    <p class="section-sub">From daily sprint work to senior-level strategy. Pick the module for what you need right now.</p>
+  </div>
+
+  <div class="modules-grid reveal">
+    <div class="module-card" style="--card-color:#a78bfa;--card-glow:rgba(167,139,250,0.08)">
+      <span class="module-emoji">⚡</span>
+      <div class="module-name">Daily Sprint</div>
+      <div class="module-count">17 prompts</div>
+      <div class="module-desc">BDD scenarios, test case writing, requirement analysis, and Jira ticket breakdowns. Your everyday QA accelerator.</div>
+    </div>
+    <div class="module-card" style="--card-color:#fb923c;--card-glow:rgba(251,146,60,0.08)">
+      <span class="module-emoji">🏗️</span>
+      <div class="module-name">Code Architect</div>
+      <div class="module-count">48 prompts</div>
+      <div class="module-desc">Playwright & Selenium scripts, POM generation, API mocking, data-driven tests, and CI/CD pipeline snippets.</div>
+    </div>
+    <div class="module-card" style="--card-color:#facc15;--card-glow:rgba(250,204,21,0.08)">
+      <span class="module-emoji">🐛</span>
+      <div class="module-name">Bug Hunter</div>
+      <div class="module-count">27 prompts</div>
+      <div class="module-desc">Flaky test diagnosis, log analysis, race condition detection, memory leak hunting. Kill bugs faster.</div>
+    </div>
+    <div class="module-card" style="--card-color:#6dfacc;--card-glow:rgba(109,250,204,0.08)">
+      <span class="module-emoji">🧠</span>
+      <div class="module-name">Strategy Room</div>
+      <div class="module-count">28 prompts</div>
+      <div class="module-desc">Risk matrices, test plans, metrics dashboards, release readiness, ROI calculators. Lead like a senior.</div>
+    </div>
+    <div class="module-card" style="--card-color:#fa6d9f;--card-glow:rgba(250,109,159,0.08)">
+      <span class="module-emoji">🚀</span>
+      <div class="module-name">Anchor Mega-Prompt</div>
+      <div class="module-count">1 power prompt</div>
+      <div class="module-desc">One Jira ticket in → complete QA package out. Gherkin, Playwright, Selenium, test data, CI/CD. All at once.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SAMPLE PROMPTS -->
+<section>
+  <div class="reveal">
+    <div class="section-label">// Sample prompts</div>
+    <h2 class="section-title">See what you're getting</h2>
+    <p class="section-sub">A taste of the 121 prompts inside. Every one is copy-paste ready with a Pro Tip and example input.</p>
+  </div>
+
+  <div class="prompts-grid">
+    <div class="prompt-card reveal">
+      <div class="prompt-card-glow" style="background:rgba(167,139,250,0.2)"></div>
+      <div class="prompt-tag">⚡ Daily Sprint</div>
+      <div class="prompt-name">Flaky Test Debugger</div>
+      <div class="prompt-use">Paste failing logs → get root cause classification + fix code in seconds.</div>
+      <div class="prompt-preview"><span>Act as a Senior Automation Engineer.</span> Analyze the following failing test and logs. Identify root cause, timing vs selector vs data issue...</div>
+    </div>
+
+    <div class="prompt-card reveal" style="transition-delay:0.1s">
+      <div class="prompt-card-glow" style="background:rgba(251,146,60,0.2)"></div>
+      <div class="prompt-tag">🏗️ Code Architect</div>
+      <div class="prompt-name">Playwright Script Generator</div>
+      <div class="prompt-use">Describe any test scenario → get a full TypeScript POM script with auto-waits and error handling.</div>
+      <div class="prompt-preview"><span>Act as an SDET.</span> Generate a Playwright (TypeScript) test using Page Object Model. Include test.describe, test.step, auto-wait best practices...</div>
+    </div>
+
+    <div class="prompt-card reveal" style="transition-delay:0.2s">
+      <div class="prompt-card-glow" style="background:rgba(250,204,21,0.15)"></div>
+      <div class="prompt-tag">🧠 Strategy Room</div>
+      <div class="prompt-name">Automation ROI Calculator</div>
+      <div class="prompt-use">Input your team size and test count → get a full ROI report to justify automation to leadership.</div>
+      <div class="prompt-preview"><span>Act as a Senior QA Lead</span> calculating the ROI of test automation. Current manual cost: hours per run × team rate × runs per year...</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- WHY -->
+<section>
+  <div class="reveal">
+    <div class="section-label">// Why this toolkit</div>
+    <h2 class="section-title">Built from the trenches.<br>Not from YouTube.</h2>
+    <p class="section-sub">Every prompt comes from real QA work at Deloitte, GlobalLogic, and product companies. 9+ years distilled into 121 prompts.</p>
+  </div>
+
+  <div class="features-strip reveal">
+    <div class="feature-item">
+      <div class="feature-icon">🎯</div>
+      <div class="feature-text">
+        <h4>Copy-paste ready</h4>
+        <p>No prompt engineering needed. Every prompt works out of the box with GPT-4o, Claude, or Copilot.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-text">
+        <h4>Pro Tips included</h4>
+        <p>Each prompt has an expert tip that upgrades output quality. The difference between good and great.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">🔄</div>
+      <div class="feature-text">
+        <h4>Works with any stack</h4>
+        <p>Java, TypeScript, Python. Selenium, Playwright, Rest Assured. Jenkins, GitHub Actions. All covered.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">🧠</div>
+      <div class="feature-text">
+        <h4>AI-native thinking</h4>
+        <p>Built by the creator of TestMind AI. These prompts reflect how AI actually thinks about QA problems.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section" id="cta">
+  <div class="cta-box reveal">
+    <div class="cta-price">One-time payment · Lifetime access</div>
+    <div class="cta-amount"><sup>$</sup>27</div>
+    <div class="cta-tagline">Less than the cost of one hour of your time.<br>Saves you hundreds.</div>
+
+    <div class="cta-includes">
+      <div class="cta-include-item"><span class="check">✓</span> 121 copy-paste ready AI prompts</div>
+      <div class="cta-include-item"><span class="check">✓</span> 5 modules covering the full QA lifecycle</div>
+      <div class="cta-include-item"><span class="check">✓</span> Pro Tips on every single prompt</div>
+      <div class="cta-include-item"><span class="check">✓</span> Example inputs so you know exactly what to paste</div>
+      <div class="cta-include-item"><span class="check">✓</span> Delivered as a Notion workspace — use immediately</div>
+      <div class="cta-include-item"><span class="check">✓</span> Works with ChatGPT, Claude &amp; GitHub Copilot</div>
+    </div>
+
+    <button class="btn-primary" style="width:100%;padding:16px;font-size:1.05rem" onclick="window.open('https://gumroad.com','_blank')">
+      Get Instant Access →
+    </button>
+    <div style="margin-top:12px;font-size:0.75rem;color:var(--muted);font-family:'Space Mono',monospace">
+      Delivered instantly via Gumroad · No subscription · No fluff
+    </div>
+  </div>
+
+  <div class="creator-section reveal">
+    <div class="creator-avatar">👩‍💻</div>
+    <div>
+      <div class="creator-name">Pooja Hiremath</div>
+      <div class="creator-bio">Senior QA Lead · SDET · Creator of TestMind AI (Google Gemini LLM)<br>9+ years across Deloitte, GlobalLogic &amp; product companies</div>
+      <div class="creator-links">
+        <a class="creator-link" href="https://testmind-ai.vercel.app" target="_blank">TestMind AI</a>
+        <a class="creator-link" href="https://linkedin.com/in/hiremath-p" target="_blank">LinkedIn</a>
+        <a class="creator-link" href="https://pooja70h-lab.github.io/ml-portfolio" target="_blank">Portfolio</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx - 6 + 'px';
+    cursor.style.top = my - 6 + 'px';
+  });
+
+  function animateRing() {
+    rx += (mx - rx - 18) * 0.12;
+    ry += (my - ry - 18) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('button, a, .module-card, .prompt-card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'scale(2)';
+      ring.style.transform = 'scale(1.5)';
+      ring.style.borderColor = 'rgba(124,109,250,0.8)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'scale(1)';
+      ring.style.transform = 'scale(1)';
+      ring.style.borderColor = 'rgba(124,109,250,0.4)';
+    });
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
