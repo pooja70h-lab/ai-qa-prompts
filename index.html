@@ -664,10 +664,117 @@
     transform: translateY(0);
   }
 
-  @media (max-width: 600px) {
-    .stats-row { gap: 24px; }
-    .creator-section { flex-direction: column; text-align: center; }
+  /* ---- MOBILE STICKY BUY BUTTON ---- */
+  .mobile-sticky {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(5,5,8,0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(124,109,250,0.2);
+    padding: 12px 16px;
+    z-index: 999;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .mobile-sticky-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .mobile-sticky-sub {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+  .mobile-sticky-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    /* Show sticky button on mobile */
+    .mobile-sticky { display: flex; }
+
+    /* Add padding at bottom so content isn't hidden behind sticky bar */
+    body { padding-bottom: 70px; }
+
+    /* Hide custom cursor on mobile */
+    .cursor, .cursor-ring { display: none; }
+    body { cursor: auto; }
+
+    /* Hero fixes */
+    .hero { padding: 1.5rem 1rem; min-height: 90vh; }
+    .hero-title { font-size: clamp(2rem, 10vw, 3.5rem); }
+    .hero-sub { font-size: 0.95rem; }
+    .badge { font-size: 9px; padding: 5px 12px; text-align: center; }
+
+    /* Stats row */
+    .stats-row { gap: 20px; margin-top: 2.5rem; }
+    .stat-num { font-size: 1.6rem; }
+    .stat-label { font-size: 0.65rem; }
+
+    /* Sections */
+    section { padding: 3rem 1rem; }
+    .section-title { font-size: clamp(1.5rem, 7vw, 2.2rem); }
+
+    /* Modules grid — single column on mobile */
+    .modules-grid {
+      grid-template-columns: 1fr !important;
+      gap: 1px;
+    }
+    .module-card:nth-child(4) { grid-column: span 1 !important; }
+    .module-card:nth-child(5) { grid-column: span 1 !important; }
+    .module-card { padding: 1.5rem; }
+    .module-name { font-size: 1rem; }
+    .module-desc { font-size: 0.85rem; word-break: normal; overflow-wrap: break-word; }
+
+    /* Prompt cards — single column */
+    .prompts-grid { grid-template-columns: 1fr; gap: 12px; }
+
+    /* Features strip */
+    .features-strip { gap: 1.5rem; }
+    .feature-item { min-width: 100%; }
+
+    /* CTA box */
+    .cta-box { padding: 2rem 1.25rem; margin: 0 0.5rem; }
+    .cta-amount { font-size: 3rem; }
+    .cta-includes { gap: 6px; }
+    .cta-include-item { font-size: 0.8rem; }
+
+    /* Creator section */
+    .creator-section {
+      flex-direction: column;
+      text-align: center;
+      margin: 1.5rem 0.5rem 0;
+    }
     .creator-links { justify-content: center; }
+
+    /* Divider */
+    .divider { margin: 0 1rem; }
+
+    /* Hero buttons */
+    .hero-ctas { flex-direction: column; align-items: center; }
+    .btn-primary, .btn-secondary { width: 100%; max-width: 300px; text-align: center; }
+  }
+
+  @media (max-width: 400px) {
+    .hero-title { font-size: 1.8rem; }
+    .badge { font-size: 8px; letter-spacing: 0.05em; }
+    .stats-row { gap: 12px; }
+    .stat-num { font-size: 1.4rem; }
   }
 </style>
 </head>
@@ -675,6 +782,17 @@
 
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursorRing"></div>
+
+<!-- MOBILE STICKY BUY BUTTON -->
+<div class="mobile-sticky">
+  <div>
+    <div class="mobile-sticky-price">$27</div>
+    <div class="mobile-sticky-sub">One-time · Lifetime access</div>
+  </div>
+  <button class="mobile-sticky-btn" onclick="window.open('https://poojahiremath.gumroad.com/l/ecxizb','_blank')">
+    Get Instant Access →
+  </button>
+</div>
 
 <!-- HERO -->
 <div class="hero">
@@ -719,8 +837,8 @@
       <div class="stat-label">Yrs Experience</div>
     </div>
     <div class="stat">
-      <div class="stat-num">∞</div>
-      <div class="stat-label">Hours Saved</div>
+      <div class="stat-num">2hrs</div>
+      <div class="stat-label">Saved/Week</div>
     </div>
   </div>
 </div>
